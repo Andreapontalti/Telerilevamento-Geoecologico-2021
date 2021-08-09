@@ -114,7 +114,7 @@ plotRGB(p224r63_2011, r=3, g=4, b=2, stretch="hist")
 
 install.packages("RStoolbox") 
 library(RStoolbox)
-#INSTALLAMENTO DI NUOVO PACCHETTO
+#INSTALLAMENTO DI NUOVO PACCHETTO (per l'elaborazione e l'analisi delle immagini di telerilevamento come il calcolo degli indici spettrali, unsupervised classification, etc.)
 
 p224r63_1988 <- brick("p224r63_1988_masked.grd")     
 #CARICAMENTO SU R DI NUOVO FILE
@@ -144,7 +144,7 @@ plotRGB(p224r63_1988, r=4, g=3, b=2, stretch="hist")     #hist=histoogramma
 plotRGB(p224r63_2011, r=4, g=3, b=2, stretch="hist")
 #CREAZIONE DI NUOVO PDF NELLA CARTELLA LAB
 
-----------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 ####### 2. R code time series second code
 #DATI E CODICI A CURA DI Emanuela Cosma
 
@@ -153,6 +153,8 @@ library(raster)
 setwd("C:/lab/greenland")
 library(raster)
 library(RStoolbox)
+install.packages("rasterVis")    #INSTALLAZIONE NUOVO PACCHETTO CHE PERMETTE DI OTTIMIZZARE LA VISUALIZZAZIONE DEI DATI RASTER
+library(rasterVis) 
 #LA WORKING DIRECTORY è IMPOSTATA NELLA CARTELLA GREENLAND, ALL'INTERNO DELLA CARTELLA LAB
 
 lst_2000 <- raster("lst_2000.tif")   #(per importare il dataset su R)
@@ -182,8 +184,6 @@ plot(TGr)         #PLOTTA LA LISTA DI FILE
 
 plotRGB(TGr, 1, 2, 3, stretch="Lin")             #UNISCE LE PRIME TRE MAPPE DI TGr USANDO UNA SCALA RGB
 
-install.packages("rasterVis")    #INSTALLAZIONE NUOVO PACCHETTO
-library(rasterVis) 
 
 rlist <- list.files(pattern="lst")
 rlist
@@ -224,16 +224,26 @@ library(ncdf4)
 library(raster)    #ci serviranno la libreria Raster per leggere i raster come sempre, ma anche la libreria NCD per leggere i file ncd; non serve mettere le "" perché il file ncdf4 è già stato installato
 setwd("C:/lab/")
 
+lswt <- raster("c_gls_LSWT_202104010000_GLOBE_SLSTRAB_v1.1.0.nc")  #caricamento di un nuovo file .nc su R
+lswt      #permette di avere info sul file caricato
+
+cl <- colorRampPalette(c('light blue','green','red','yellow'))(100)
+plot(lswt, col=cl)
+lswt <- raster::reclassify(lswt, cbind(252:255, NA), right=TRUE) #permette di riclassificare i colori dell'immagine
+
+lswtres <- aggregate(lswt, fact=100)#QUESTA FUNZIONE MODIFICA LA QUANTITA DI PIXEL/RISOLUZIONE DELL'IMMAGINE (RICAMPIONAMENTO), PER RIDURRE ANCHE IL PESO DEL FILE CHE IN QUESTO CASO è MOLTO PESANTE
+#quel 100 corrisponde al numero di celle raggruppate per formare delle mega-celle più grandi. Con 50 si diminuisce di 2500 volte la risoluzione
+
+plot(lswtres, col=cl) #plottaggio nuovi colori
 
 albedo <- raster("albedobello.nc")     
-CARICAMENTO DI UN SINGOLO LAYER SU R (SE SE NE FOSSE USATO PIU DI UNO SI SAREBBE USATO LA FUNZIONE BRICK)
+#CARICAMENTO DI UN SINGOLO LAYER SU R (SE SE NE FOSSE USATO PIU DI UNO SI AVREBBE USATO LA FUNZIONE "BRICK" e non "RASTER")
 
 cl<-colorRampPalette(c('light blue', 'green', 'red'))(100)
 plot(albedo, col=cl)  #PLOTTA L'IMMAGINE DELL'ALBEDO PRESO DA COPERNICUS
 
-albedores <- aggregate(albedo, fact=100) #QUESTA FUNZIONE MODIFICA LA QUANTITA DI PIXEL/RISOLUZIONE DELL'IMMAGINE, PER RIDURRE ANCHE IL PESO DEL FILE CHE IN QUESTO CASO è MOLTO PESANTE
-#quel 100 corrisponde al numero di celle raggruppate per formare delle mega-celle più grandi. Con 50 si diminuisce di 2500 volte la risoluzione
-
+albedores <- aggregate(albedo, fact=100) #effettuiamo un ricampionamento come si era fatto con "lwst", per ridurre la pesantezza del file "albedo"
+plot(albedores, col=cl) #plottaggio della immagine ricampionata
 ----------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -242,11 +252,11 @@ albedores <- aggregate(albedo, fact=100) #QUESTA FUNZIONE MODIFICA LA QUANTITA D
 ################ 4. R code knit R fourth code
 
 setwd("C:/lab/")   #vuol dire SET WORKING DIRECTORY
-install.packages("knitr")   ##pacchetto importante da scaricare
+install.packages("knitr")   ##pacchetto da scaricare. Permette di usare le funzioni e codici knit R
 
-library(knitr)
+library(knitr)   
 library(raster)
-library(rasterVis)    ###apriamo varie librerie a caso
+library(rasterVis)    ###apriamo le librerie che ci serviranno per usare le prossime funzioni
 
 require(knitr) #funzione analoga a library
 stitch("R_code_greenland.txt", template=system.file("misc", "knitr-template.Rnw", package="knitr"))   #crea automaticamente un report basato su uno script di R e un template
@@ -256,34 +266,17 @@ stitch("R_code_greenland.txt", template=system.file("misc", "knitr-template.Rnw"
 ################ 5. R code multivariat analysis fifth code
 
 setwd("C:/lab/")
-library(raster)    #inseriamo la solita libreria
-
-gc <- brick("gran_canyon.jpg")   #brickiamo l'immagine del gran canyon e chiamiamola gc
-plotRGB(gc, r=1, g=2, b=3, stretch="lin")  #modifichiamo un po' lo stretch dei colori
-plotRGB(gc, r=1, g=2, b=3, stretch="hist") #qui usiamo lo stretch modalità istogramma
-gc2 <- brick("canyon.jpg")
-plotRGB(gc2, r=1, g=2, b=3, stretch="lin")  #modifichiamo un po' lo stretch dei colori
-plotRGB(gc2, r=1, g=2, b=3, stretch="hist") #qui usiamo lo stretch modalità istogramma (sembra più scura, c'è più contrasto)
-
-
+library(raster)    #inseriamo le librerie necessarie
 library(RStoolbox) 
-library(raster)
-gcc2 <- unsuperClass(gc2, nClasses=2)  #funzione utilizzata per classificare i colori in due classi (in questo caso)
-plot(gcc2$map)
-gcc4 <- unsuperClass(gc, nClasses=4)  #qui classifica su 4 classi
-plot(gcc$map)
 
-
+#### LAVORIAMO CON LE IMMAGINI DELL'AMMAZZONIA
 #Si possono vedere file/immagini con diversa varianza/variabilità utilizzando delle funzioni. Queste prendono il nome di ANALISI MULTIVARIATE
 p224r63_2011 <- brick("p224r63_2011_masked.grd")  #brickiamo come solito per caricare l'immagine
-plot(p224r63_2011)
+plot(p224r63_2011)  #solita funzione che permette di plottare l'immagine
+
 plot(p224r63_2011$B1_sre, p224r63_2011$B2_sre, col="red", pch=19, cex=2)  #plottiamo in una banda 1 e 2 la foto. Uscirà un piano cartesiano XY con una scia di punti che studiano la varianza dei colori
 pairs(p224r63_2011)  #mette in correlazione tutte le variabili (ossia le bande) della figura. Ne esce un insieme di diagrammi e numeri
 
-
-#### TORNIAMO A LAVORARE CON LE IMMAGINI DELL'AMMAZZONIA
-p224r63_2011 <- brick("p224r63_2011_masked.grd")
-p224r63_2011
 pairs(p224r63_2011)  #MOSTRA LO SCHEMA VISTO NELL'ESERCIZIO PRECEDENTE, con indici di correlazione e variazione vari
 p224r63_2011res <- aggregate(p224r63_2011, fact=10)  #aggrega i pixel per diminuire la risoluzione della mappa( ma almeno puoi usare R senza aspettare 5 ore che il pc carica)
 
@@ -296,11 +289,10 @@ plotRGB(p224r63_2011res, r=4, g=3, b=2, stretch="lin")
 p224r63_2011res_pca <- rasterPCA(p224r63_2011res)    #dovrebbe generare una nuova immagine tramite questa funzione
 summary(p224r63_2011res_pca$model)   #spiega quasi la totalità della varianza in questo modello (è praticamente un riassunto)
 p224r63_2011res_pca  
-plotRGB(p224r63_2011res_pca$map, r=1, g=2, b=3, stretch="lin")
+plotRGB(p224r63_2011res_pca$map, r=1, g=2, b=3, stretch="lin")  #plottaggio con colori RGB
+plot(p224r63_2011res_pca$map$PC1,p224r63_2011res_pca$map$PC2)  #plotaggio della banda PC1 rispetto alla banda PC2 
 
-
-str(p224r63_2011res_pca)  
-#visualizza in modo compatto la struttura di un oggetto R arbitrario
+str(p224r63_2011res_pca)  #visualizza in modo compatto la struttura di un oggetto R arbitrario
 -------------------------------------------------------------------------------------------------------------------------
 
 
@@ -326,12 +318,25 @@ plot(soc$map)   #plottiamo "soc"
 set.seed(16)
 soc <- unsuperClass(so, nClasses=5) #ora lo stesso, ma con 5 classi di colore
 
-#Unsupervised classification però con 20 classi (che è quello che hai fatto)
+#Unsupervised classification però con 20 classi
 socca <- unsuperClass(so, nClasses=20)    #uso socca e non soc perché se no mi autoelimina quella con 3 classi
 plot(socca$map)
 
-cl <- colorRampPalette(c('yellow','red','black'))(100)  
-#in questa maniera si può decidere quale gamma di colori utilizzare nella unsupervised classification
+######PROVIAMO QUESTA NUOVA FUNZIONE CON IL FILE DEL GRAN CANYON, SCARICATO DA VIRTUALE.UNIBO
+
+gc <- brick("gran_canyon.jpg")   #brickiamo l'immagine del gran canyon e chiamiamola gc
+plotRGB(gc, r=1, g=2, b=3, stretch="lin")  #modifichiamo un po' lo stretch dei colori
+plotRGB(gc, r=1, g=2, b=3, stretch="hist") #qui usiamo lo stretch modalità istogramma
+gc2 <- brick("canyon.jpg")
+plotRGB(gc2, r=1, g=2, b=3, stretch="lin")  #modifichiamo un po' lo stretch dei colori
+plotRGB(gc2, r=1, g=2, b=3, stretch="hist") #qui usiamo lo stretch modalità istogramma (sembra più scura, c'è più contrasto)
+
+gcc2 <- unsuperClass(gc2, nClasses=2)  #funzione utilizzata per classificare i colori in due classi (in questo caso)
+plot(gcc2$map)
+gcc4 <- unsuperClass(gc, nClasses=4)  #qui classifica su 4 classi
+plot(gcc$map)
+
+
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -341,20 +346,20 @@ setwd("C:/lab/")
 library(raster)
 library(rasterVis)
 library(rasterdiv)
-library(RStoolbox)
+library(RStoolbox) #solito settaggio della working directory e inserimento di library necessarie 
 
 plot(copNDVI)  #fa vedere l'intero globo con un indice di copertura forestale
 
-copNDVI <- reclassify(copNDVI, cbind(253:255, NA))   #vogliamo togliere la massa d'acqua blu perché non ci interessa. con questo codice ce la facciamooooo
+copNDVI <- reclassify(copNDVI, cbind(253:255, NA))   #permette di togliere la massa d'acqua blu dalla mappa originale
 plot(copNDVI)    #mostra l'indice di vegetazione boschiva ma senza il macchione blu degli oceani e mari
 
 levelplot(copNDVI)   #con questa mappa si denotano le zone più desertiche/senza vegetazione e più vegetate, usando come indice il livello di evotraspirazione (che sarà alto in ambienti vegetati e nullo in ambienti desertici)
 
 
-install.packages("ggplot2")   #INSTALLAZIONE NUOVO PACCHETTO
+install.packages("ggplot2")   #INSTALLAZIONE NUOVO PACCHETTO. PERMETTE DI USARE LE FUNZIONI GGPLOT
 library(ggplot2)
 
-defor1 <- brick("defor1.png")   #inseriamo con brick l'immagine defor1
+defor1 <- brick("defor1.png")   #inseriamo con brick l'immagine defor1 (con sempre segnata anche la sua estensione, in questo caso png)
 plotRGB(defor1, r=1, g=2, b=3, stretch="lin")
 
 defor2 <- brick("defor2.png") 
@@ -365,7 +370,7 @@ par(mfrow=c(1,2))
 plotRGB(defor1, r=1, g=2, b=3, stretch="lin")
 plotRGB(defor2, r=1, g=2, b=3, stretch="lin")
 
-install.packages("gridExtra")   #INSTALLAZIONE NUOVO PACCHETTO
+install.packages("gridExtra")   #INSTALLAZIONE NUOVO PACCHETTO (per lavorare/creare griglie, grafici e tabelle)
 library(gridExtra)
 
 # multiframe with ggplot2 and gridExtra
@@ -373,54 +378,6 @@ p1 <- ggRGB(defor1, r=1, g=2, b=3, stretch="lin")     #mette le due immagini ass
 p2 <- ggRGB(defor2, r=1, g=2, b=3, stretch="lin")
 grid.arrange(p1, p2, nrow=2)
 
-
-
-###### 7.2 GGPLOT CON AMAZZONIA
-
-library(raster)
-library(RStoolbox) 
-library(ggplot2)
-library(gridExtra)
-setwd("C:/lab/") #inserimento delle appostie library e working directory
-
-defor1 <- brick("defor1.png")
-defor2 <- brick("defor2.png")
-d1c <- unsuperClass(defor1, nClasses=2)  #mostra inidice vegetazionale, suddiviso in 2 classi
-plot(d1c$map)
-
-d2c <- unsuperClass(defor2, nClasses=2)
-plot(d2c$map)
-d2c3 <- unsuperClass(defor2, nClasses=3)
-plot(d2c3$map)
-#stessa funzione di quella precedente ma con l'immaigne "defor2"
-
-
-freq(d1c$map)  #calcola la frequenza fra la prima e la seconda classe fra le due immagini (in questo caso, la frequenza totale di foreste è molto alto rispetto al resto (se si somano i due valori si raggiungono le dimensioni totali dell'immagine)
-s1=341292   #s è la dimensione
- 
-freq(d2c$map) 
-s2=342726   
-
-s1 <- 341292 
-prop1 <- freq(d1c$map) / s1
-s2 <- 342726
-prop2 <- freq(d2c$map) / s2   #in questo modo, abbiamo proporzionato i valori dimesnionali, in modo da essere più accurati e avere dati simili
-
-
-#CON I SEGUENTI CODICI E FUNZIONI SI EFFETTUA UNA TABELLA/DATASET PER PARAGONARE I DATI PRE-DEFORESTAZIONE E POST-DEFORESTAZIONE
-cover <- c("forest", "agriculture")
-percent_1992 <- c(89.83, 10.16)  #qui decidiamo le assi e ordinate dei dati
-percent_2006 <- c(52.06, 47.93)
-percentages <- data.frame(cover, percent_1992, percent_2006)
-percentages
-
-#SI USA GGPLOT PER CREARE UNA RAPPRESENTAZIONE ILLUSTRATIVA DEL DATO
-par(mfrow=c(1,2))
-p1 <- ggplot(percentages, aes(x=cover, y=percent_2006, color=cover)) + geom_bar(stat="identity", fill="white")
-p2 <- ggplot(percentages, aes(x=cover, y=percent_1992, color=cover)) + geom_bar(stat="identity", fill="white")
-#ora scrivendo "p1" o "p2" ci verranno fuori dei grafici a barre con le percentuali di land cover
-
-grid.arrange(p1, p2, nrow=1)  #con questa funzione si vedono i due grafici a barre assieme  #NON SI USA PAR PERCHE ESSO FUNZIONA PER I PLOT
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 ################### 8. R code vegetation index eighth code
@@ -459,7 +416,7 @@ plot(dvi2, col=cl, main="DVI at time 2")
 difdvi <- unione - dvi2    #unisce le due mappe per compararle meglio
 
 dev.off()        #facciamo dev.off per "riordinare" la mappa
-cld <colorRampPalette(c('blue','white','red'))(100)   #qua decidiamo i colori come solito
+cld <colorRampPalette(c('blue','white','red'))(100)   #qua decidiamo i colori come solito da usare nel plottaggio della mappa susseguente
 plot(difdvi, col=cld)    #vabbè insomma, plottiamo come sempre
 
 
@@ -490,6 +447,56 @@ plot(difndvi, col=cld)             #sottriamo i colori delle due mappe ndvi1 e n
 
 
 ######## 9. R code land cover ninth code
+
+###### IMMAGINI AMAZZONIA
+
+library(raster)
+library(RStoolbox) 
+library(ggplot2)
+library(gridExtra)
+setwd("C:/lab/") #inserimento delle appostie library e working directory
+
+defor1 <- brick("defor1.png")
+defor2 <- brick("defor2.png")
+d1c <- unsuperClass(defor1, nClasses=2)  #mostra inidice vegetazionale, suddiviso in 2 classi
+plot(d1c$map)
+
+d2c <- unsuperClass(defor2, nClasses=2)
+plot(d2c$map)
+d2c3 <- unsuperClass(defor2, nClasses=3)
+plot(d2c3$map)
+#stessa funzione di quella precedente ma con l'immaigne "defor2"
+
+
+freq(d1c$map)  #calcola la frequenza fra la prima e la seconda classe fra le due immagini (in questo caso, la frequenza totale di foreste è molto alto rispetto al resto (se si somano i due valori si raggiungono le dimensioni totali dell'immagine)
+s1=341292   #s è la dimensione
+ 
+freq(d2c$map) 
+s2=342726   
+
+s1 <- 341292 
+prop1 <- freq(d1c$map) / s1
+s2 <- 342726
+prop2 <- freq(d2c$map) / s2   #in questo modo, abbiamo proporzionato i valori dimesnionali, in modo da essere più accurati e avere dati simili
+
+
+#CON I SEGUENTI CODICI E FUNZIONI SI VUOLE CREARE UNA TABELLA/DATASET PER PARAGONARE I DATI PRE-DEFORESTAZIONE E POST-DEFORESTAZIONE
+cover <- c("forest", "agriculture")
+percent_1992 <- c(89.83, 10.16)  #qui inseriamo i valori dei dati che abbiamo recuperato da prop1
+percent_2006 <- c(52.06, 47.93)  #stesso processo ma con prop2
+percentages <- data.frame(cover, percent_1992, percent_2006) #crea una tabella raggruppando in questo caso i dati di cover, percent_1992 e percent_2006
+percentages
+
+#SI USA GGPLOT PER CREARE UNA RAPPRESENTAZIONE ILLUSTRATIVA DEL DATO
+par(mfrow=c(1,2))
+p1 <- ggplot(percentages, aes(x=cover, y=percent_2006, color=cover)) + geom_bar(stat="identity", fill="white")
+p2 <- ggplot(percentages, aes(x=cover, y=percent_1992, color=cover)) + geom_bar(stat="identity", fill="white")
+#ora scrivendo "p1" o "p2" ci verranno fuori dei grafici a barre con le percentuali di land cover
+
+grid.arrange(p1, p2, nrow=1)  #con questa funzione si vedono i due grafici a barre assieme  #NON SI USA PAR PERCHE ESSO FUNZIONA PER I PLOT
+ 
+
+###Ggplot, ndvi & CO con le immagini Sentinel
 
 setwd("C:/lab/")
 library(raster)
@@ -530,12 +537,7 @@ sentpca <- rasterPCA(sent)   #analizza la componente princiapale del raster
 plot(sentpca$map)
 summary(sentpca$model)   #mostra il sommario dei dati della mappa sentpca
 
-
-setwd("C:/lab/")
-library(raster)
-library(RStoobox)
-library(ggplot2)
-
+######altro progetto con immagini da Sentinel
 
 sent <- brick("sentinel.png")  #caricamento dell'immagine su R
 sentpca <- rasterPCA(sent)   #mostra le 4 mappe con la metodologia pca (che serviva per notare il livello di variabilità) #Calculates R-mode PCA for RasterBricks or RasterStacks and returns a RasterBrick with multiple layers of PCA scores.
@@ -549,7 +551,7 @@ Kek <- colorRampPalette(c('light blue','dark green','pink','magenta','orange','y
 plot(Up, col=Kek) 
 
 
-# NB: c'è un modo per salvare un codice di R che possiamo poi riutilizzare o "regalare"  qualcuno. Scarichiamo il file R da virtuale e salviamolo in LAB. 
+# NB: c'è un modo per salvare un codice di R che possiamo poi riutilizzare o "regalare" a qualcuno. Scarichiamo il file R da virtuale e salviamolo in LAB. 
 source("source_test_lezione.r")  #usando questa funzione R va a pescare quel file col codice R e lo plotta tutto ue se brav l m' guaglione
 
 install.packages("viridis")
@@ -611,10 +613,10 @@ defor2 <-brick("defor2.png")
 plotRGB(defor2, r=1, g=2, b=3, stretch="lin")
 
 library(rgdal) #nuova library 
-click(defor2, id=T, xy=T, cell=T, type="p", pch=16, cex=4, col="yellow")  #permette di inserire dei punti sulla mappa (si può scegliere pure il colore e inserisce la posizione, e numerazione del punto su R )
+click(defor2, id=T, xy=T, cell=T, type="p", pch=16, cex=4, col="yellow")  #Funzione CLICK: permette di inserire dei punti sulla mappa (si può scegliere  il colore, inserire la posizione, e numerazione del punto su R )
 
 plotRGB(defor2, r=1, g=2, b=3, stretch="hist")
-click(defor2, id=T, xy=T, cell=T, type="p", pch=16, cex=4, col="yellow")
+click(defor2, id=T, xy=T, cell=T, type="p", pch=16, cex=4, col="yellow") 
 
 
 ##coi seguenti formule, si definiscono le colonne del dataset
@@ -718,6 +720,4 @@ ggplot(spectrals, aes(x=Year)) +
  geom_line(aes(y=Water_Percentage), color="blue")
  
  ggplot(spectrals, aes(x=Year)) +
- geom_line(aes(y=No_water_Percentage), color="brown
- 
- ")
+ geom_line(aes(y=No_water_Percentage), color="brown")
