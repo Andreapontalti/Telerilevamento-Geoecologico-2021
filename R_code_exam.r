@@ -670,14 +670,14 @@ library(raster)
 library(RStoolbox) 
 library(ggplot2)
 library(gridExtra)
-setwd("C:/lab/Aral")
+setwd("C:/lab/Aral") #settaggio come nostro solito della working directory e caricamento delle 4 library necessarie al funzionamento dei codici seguenti
 
 a2001 <- brick("Aral2001.jpg")
 a2004 <- brick("Aral2004.jpg")
 a2008 <- brick("Aral2008.jpg")
 a2012 <- brick("Aral2012.jpg")
 a2014 <- brick("Aral2014.jpg")
-a2018 <- brick("Aral2018.jpg")
+a2018 <- brick("Aral2018.jpg")  #tramite funzione brickk carichiamo le 6 immagini su R con i suddetti nomi
 
 
 Aral1 <- unsuperClass(a2001, nClasses=3)  
@@ -685,7 +685,7 @@ Aral2 <- unsuperClass(a2004, nClasses=3)
 Aral3 <- unsuperClass(a2008, nClasses=3)  
 Aral4 <- unsuperClass(a2012, nClasses=3)  
 Aral5 <- unsuperClass(a2014, nClasses=3)  
-Aral6 <- unsuperClass(a2018, nClasses=3)
+Aral6 <- unsuperClass(a2018, nClasses=3) #effettuiamo una categorizzazione in classi di colore per distinguere le zone con acqua, senza acqua e "altro"
 
 plot(Aral1$map)
 freq(Aral1$map)   #-> evaporated lake=140829  lake= 64533
@@ -699,7 +699,7 @@ plot(Aral5$map)
 freq(Aral5$map)  #-> evaporated lake=180212  lake= 25097
 plot(Aral6$map)
 freq(Aral6$map)  #-> evaporated lake=172939  lake= 32383
-AreaTOT=336015 #Somma superficie
+AreaTOT=336015 #Somma superficie                 #troviamo la frequenza totale (=area totale) delle 3 classi di colore (che sarà ovviamente uguale in tutte le immagini in quanto sono della stessa dimensione) tramite la funzione freq
 
 
 prop1 <- freq(Aral1$map)/ AreaTOT
@@ -707,17 +707,18 @@ prop2 <- freq(Aral2$map) / AreaTOT
 prop3 <- freq(Aral3$map) / AreaTOT
 prop4 <- freq(Aral4$map) / AreaTOT
 prop5 <- freq(Aral5$map) / AreaTOT
-prop6 <- freq(Aral6$map) / AreaTOT
+prop6 <- freq(Aral6$map) / AreaTOT    #mettiamo in proporzione le frequenze per trovare dei valori in percentuale
 
-#calcolo le percentuali relative dell'area del solo Lago aral, escludendo la parte di contorno
+#####calcolo le percentuali relative dell'area del solo Lago aral, escludendo la classe di colore di contorno 
 
 Water_Percentage= c(31.3, 26.4, 14.2, 16.7, 12.2, 15.8)
 No_water_Percentage= c(68.7, 73.6, 85.8, 83.3,87.8, 84.2)
-Year= c(2001, 2004, 2008, 2012, 2014, 2018)
-spectrals <- data.frame(Year, Water_Percentage, No_water_Percentage)
+Year= c(2001, 2004, 2008, 2012, 2014, 2018)     #caricamento dei dati ritrovati e già posseduti su R
+datiacqua <- data.frame(Year, Water_Percentage, No_water_Percentage)  #creazione di una tabella coi dati prima inseriti
 
-ggplot(spectrals, aes(x=Year)) +
- geom_line(aes(y=Water_Percentage), color="blue")
- 
- ggplot(spectrals, aes(x=Year)) +
- geom_line(aes(y=No_water_Percentage), color="brown")
+ggplot(datiacqua, aes(x=Year)) +
+ geom_line(aes(y=Water_Percentage), color="blue")   #crea un grafico riguardante l'andamento in percentuale della superficie inondata del lago, con una linea blu
+  
+ ggplot(datiacqua, aes(x=Year)) +
+ geom_line(aes(y=No_water_Percentage), color="brown") #crea un grafico riguardante l'andamento in percentuale della superficie non più inondata del lago, con una linea marrone
+  
