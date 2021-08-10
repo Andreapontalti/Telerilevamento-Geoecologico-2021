@@ -17,7 +17,7 @@ Aral2 <- unsuperClass(a2004, nClasses=3)
 Aral3 <- unsuperClass(a2008, nClasses=3)  
 Aral4 <- unsuperClass(a2012, nClasses=3)  
 Aral5 <- unsuperClass(a2014, nClasses=3)  
-Aral6 <- unsuperClass(a2018, nClasses=3) #effettuiamo una categorizzazione in classi di colore per distinguere le zone con acqua, senza acqua e "altro"
+Aral6 <- unsuperClass(a2018, nClasses=3) #effettuiamo una categorizzazione in 3 classi di colore per distinguere le zone con acqua, senza acqua e "altro"
 
 plot(Aral1$map)
 freq(Aral1$map)   #-> evaporated lake=140829  lake= 64533
