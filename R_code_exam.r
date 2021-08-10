@@ -10,6 +10,7 @@
 # 8. R code vegetation index eighth code 
 # 9. R code land cover ninth code
 # 10. R code variability tenth code
+# 11. Codici esame Telerilevamento
 
 ----------------------------------------------------------------------
 #### # 1. remote sensing summary first code
@@ -144,7 +145,7 @@ plotRGB(p224r63_1988, r=4, g=3, b=2, stretch="hist")     #hist=histoogramma
 plotRGB(p224r63_2011, r=4, g=3, b=2, stretch="hist")
 #CREAZIONE DI NUOVO PDF NELLA CARTELLA LAB
 
---------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------
 ####### 2. R code time series second code
 #DATI E CODICI A CURA DI Emanuela Cosma
 
@@ -215,7 +216,7 @@ plot(melt_amount, col=clb)
 
 levelplot(melt_amount, col.regions=clb)
 #MOSTRA I PIU LIVELLI DEI PLOT
------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------
 #################################### 3. R code dopernicus third code
 
 
@@ -244,7 +245,7 @@ plot(albedo, col=cl)  #PLOTTA L'IMMAGINE DELL'ALBEDO PRESO DA COPERNICUS
 
 albedores <- aggregate(albedo, fact=100) #effettuiamo un ricampionamento come si era fatto con "lwst", per ridurre la pesantezza del file "albedo"
 plot(albedores, col=cl) #plottaggio della immagine ricampionata
-----------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -261,7 +262,7 @@ library(rasterVis)    ###apriamo le librerie che ci serviranno per usare le pros
 require(knitr) #funzione analoga a library
 stitch("R_code_greenland.txt", template=system.file("misc", "knitr-template.Rnw", package="knitr"))   #crea automaticamente un report basato su uno script di R e un template
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ################ 5. R code multivariat analysis fifth code
 
@@ -293,7 +294,7 @@ plotRGB(p224r63_2011res_pca$map, r=1, g=2, b=3, stretch="lin")  #plottaggio con 
 plot(p224r63_2011res_pca$map$PC1,p224r63_2011res_pca$map$PC2)  #plotaggio della banda PC1 rispetto alla banda PC2 
 
 str(p224r63_2011res_pca)  #visualizza in modo compatto la struttura di un oggetto R arbitrario
--------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -337,7 +338,7 @@ gcc4 <- unsuperClass(gc, nClasses=4)  #qui classifica su 4 classi
 plot(gcc$map)
 
 
--------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 ################ 7. R code ggplot2 seventh code
@@ -379,7 +380,7 @@ p2 <- ggRGB(defor2, r=1, g=2, b=3, stretch="lin")
 grid.arrange(p1, p2, nrow=2)
 
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------
 ################### 8. R code vegetation index eighth code
 
 install.packages("rasterdiv")
@@ -441,7 +442,7 @@ cld <- colorRampPalette(c('blue','white','red'))(100)
 plot(difndvi, col=cld)             #sottriamo i colori delle due mappe ndvi1 e ndvi2. La risultante sarà una mappa con macchié più rosse nelle zone più deforestate
 
 
----------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -566,7 +567,7 @@ ggplot() + geom_raster(pc1sd5, mapping = aes(x = x, y = y, fill = layer)) + scal
 #Altre colorazioni per la mappa a tre variabili
 
 
--------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 ############ 10. R code variability tenth code
 
 setwd("C:/lab/EN")
@@ -663,8 +664,8 @@ ggplot(spectralst, aes(x=band)) +
  labs(x="band",y="reflectance")
 
 
-------------------------------------------------------------------------------------------------
-###################### 10. Codici esame Telerilevamento
+#------------------------------------------------------------------------------------------------
+###################### 11. Codici esame Telerilevamento
 
 library(raster)
 library(RStoolbox) 
@@ -719,6 +720,6 @@ datiacqua <- data.frame(Year, Water_Percentage, No_water_Percentage)  #creazione
 ggplot(datiacqua, aes(x=Year)) +
  geom_line(aes(y=Water_Percentage), color="blue")   #crea un grafico riguardante l'andamento in percentuale della superficie inondata del lago, con una linea blu
   
- ggplot(datiacqua, aes(x=Year)) +
+ggplot(datiacqua, aes(x=Year)) +
  geom_line(aes(y=No_water_Percentage), color="brown") #crea un grafico riguardante l'andamento in percentuale della superficie non più inondata del lago, con una linea marrone
   
