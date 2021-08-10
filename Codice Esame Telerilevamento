@@ -1,7 +1,7 @@
-library(raster)
-library(RStoolbox) 
-library(ggplot2)
-library(gridExtra)
+library(raster)  #permette l'utilizzo dei raster e funzioni annesse
+library(RStoolbox) #permette l'uso della Unsupervised Classification
+library(ggplot2)  #permette l'uso delle funzioni ggplot
+library(gridExtra)   #permette l'uso e creazione di griglie, tabelle e grafici
 setwd("C:/lab/Aral") #settaggio come nostro solito della working directory e caricamento delle 4 library necessarie al funzionamento dei codici seguenti
 
 a2001 <- brick("Aral2001.jpg")
