@@ -631,22 +631,23 @@ geom_line(aes(y=forest), color="green") #plotta in maniera personalizzata le fir
 
 ggplot(spectrals, aes(x=band)) +
  geom_line(aes(y=forest), color="green") +
- geom_line(aes(y=water), color="blue") 
+ geom_line(aes(y=water), color="blue") #altro plottaggio personalizzato delle firme spettrali tramite un ggplot
 
 defor1 <- brick("defor1.png")
 plotRGB(defor1, r=1, g=2, b=3, stretch="lin")
 plotRGB(defor2, r=1, g=2, b=3, stretch="lin")
-click(defor2, id=T, xy=T, cell=T, type="p", pch=16, col="yellow")
+click(defor2, id=T, xy=T, cell=T, type="p", pch=16, col="yellow")   #come già visto in codici passati, la funzione click permette di cliccare sulla mappa creata e selezionare dei punti su di essa, che verranno salvati
 
 band <- c(1,2,3)
 time1 <- c(223,11,33)
 time2 <- c(197,163,151)
-spectralst <- data.frame(band, time1, time2)
+spectralst <- data.frame(band, time1, time2) #inserimento di nuovi dati e creazione di una nuova tabella denominata "sectralst"
+
 
 ggplot(spectrals, aes(x=band)) +
  geom_line(aes(y=time1), color="red") +
  geom_line(aes(y=time2), color="gray") +
- labs(x="band",y="reflectance")
+ labs(x="band",y="reflectance")  #altro plottaggio personalizzato delle firme spettrali tramite un ggplot
 
 
 band <- c(1,2,3)
@@ -654,14 +655,14 @@ time1 <- c(223,11,33)
 time1p2 <- c(218,16,38)
 time2 <- c(197,163,151)
 time2p2 <- c(149,157,133)
-spectralst <- data.frame(band, time1, time2, time1p2, time2p2)
+spectralst <- data.frame(band, time1, time2, time1p2, time2p2)   #inserimento di nuovi dati e creazione di una nuova tabella denominata "sectralst"
 
 ggplot(spectralst, aes(x=band)) +
  geom_line(aes(y=time1), color="red") +
  geom_line(aes(y=time1p2), color="red") +
  geom_line(aes(y=time2), color="gray") +
  geom_line(aes(y=time2p2), color="gray") +
- labs(x="band",y="reflectance")
+ labs(x="band",y="reflectance")           #altro plottaggio personalizzato delle firme spettrali tramite un ggplot
 
 
 #------------------------------------------------------------------------------------------------
